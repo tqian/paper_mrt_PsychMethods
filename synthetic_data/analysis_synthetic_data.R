@@ -49,6 +49,24 @@ estimate(fit_model1)
 # I(send - 0.6)    1.57e-01 3.10e-02 2.84e-01 6.22e-02  6.40e+00 1.00e+00  34  0.0162 *  
 
 
+xmat <- synthetic_data %>%
+    transmute("(Intercept)" = .$"(Intercept)",
+              "jbsteps30pre.log" = .$"jbsteps30pre.log",
+              "jbsteps30.log.lag1" = .$"jbsteps30.log.lag1",
+              "I(send - 0.6)" = .$"I(send - 0.6)")
+
+fit_model1.1 <- geese.glm(x = as.matrix(xmat),
+                          y = synthetic_data$jbsteps30.log,
+                          w = synthetic_data$avail,
+                          id = as.factor(synthetic_data$user),
+                          family = gaussian(), corstr = "independence")
+estimate(fit_model1.1)
+
+#                    Estimate  95% LCL  95% UCL       SE Hotelling      df1 df2 p-value    
+# (Intercept)        1.90e+00 1.80e+00 2.00e+00 4.91e-02  1.50e+03 1.00e+00  33 < 1e-04 ***
+# jbsteps30pre.log   3.41e-01 3.01e-01 3.81e-01 1.98e-02  2.98e+02 1.00e+00  33 < 1e-04 ***
+# jbsteps30.log.lag1 3.97e-02 1.69e-02 6.25e-02 1.12e-02  1.25e+01 1.00e+00  33 0.00121 ** 
+# I(send - 0.6)      1.61e-01 3.80e-02 2.85e-01 6.07e-02  7.08e+00 1.00e+00  33 0.01197 *  
 
 
 ##### Model 2. effect change over time #####
