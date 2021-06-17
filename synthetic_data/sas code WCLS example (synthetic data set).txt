@@ -1,0 +1,51 @@
+* import the synthetic_data_37subject_210time_SAS.csv data set;
+* you may need to modify the directory;
+
+FILENAME REFFILE '/home/synthetic_data_37subject_210time_SAS.csv';
+
+PROC IMPORT DATAFILE=REFFILE
+	DBMS=CSV
+	OUT=example_data;
+	GETNAMES=YES;
+RUN;
+
+* add variable: centered treatment indicator;
+* (suppose the randomization probability is 0.6 in this case);
+data example_data;
+	set example_data;
+	send_ctr = send - 0.6;
+run;
+
+* Marginal effect;
+proc gee data = example_data;
+	class userid;
+	model jbsteps30_log = jbsteps30pre_log send_ctr / dist = normal;
+	repeated subject = userid / corr = ind;
+	weight avail;
+run;
+
+* Marginal effect with more control variables in WCLS fit;
+proc gee data = example_data;
+	class userid;
+	model jbsteps30_log = jbsteps30pre_log jbsteps30_log_lag1 send_ctr / dist = normal;
+	repeated subject = userid / corr = ind;
+	weight avail;
+run;
+
+* Effect change over time;
+proc gee data = example_data;
+	class userid;
+	model jbsteps30_log = jbsteps30pre_log study_day_nogap send_ctr
+		  send_ctr * study_day_nogap / dist = normal;
+	repeated subject = userid / corr = ind;
+	weight avail;
+run;
+
+* Effect moderation by outcome at previous time point;
+proc gee data = example_data;
+	class userid;
+	model jbsteps30_log = jbsteps30pre_log jbsteps30_log_lag1 
+	      location_homework send_ctr send_ctr * jbsteps30_log_lag1 / dist = normal;
+	repeated subject = userid / corr = ind;
+	weight avail;
+run;
