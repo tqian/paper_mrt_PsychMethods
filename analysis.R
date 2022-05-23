@@ -52,13 +52,13 @@ suggest$at.home.or.work <- (suggest$location.category %in% c("home", "work"))
 
 unavail_sent_slots <-
     filter(suggest, !avail & !is.na(notification.message)) %>%
-    select(user, study.day.nogap, slot, avail, notification.message) %>%
-    mutate('Message sent' = !is.na(notification.message)) %>% select(-notification.message) %>%
+    dplyr::select(user, study.day.nogap, slot, avail, notification.message) %>%
+    mutate('Message sent' = !is.na(notification.message)) %>% dplyr::select(-notification.message) %>%
     rename('User' = user, 'Non-travel study day'= study.day.nogap,
            'Decision slot' = slot, 'Available' = avail)
 no_message_tag <- 
     filter(suggest, send & !travel & study.day.nogap <= 42 & is.na(send.sedentary)) %>%
-    select(user, study.day.nogap, slot, 
+    dplyr::select(user, study.day.nogap, slot, 
            notification.message) %>%
     rename('User' = user,
            'Non-travel study day' = study.day.nogap,
